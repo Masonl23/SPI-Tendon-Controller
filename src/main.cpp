@@ -9,6 +9,7 @@
 #include <ml_sercom_1.h>
 #include <stdbool.h>
 
+/// @brief  SPI STUFF
 static DmacDescriptor base_descriptor[3] __attribute__((aligned(16)));
 static volatile DmacDescriptor wb_descriptor[3] __attribute__((aligned(16)));
 
