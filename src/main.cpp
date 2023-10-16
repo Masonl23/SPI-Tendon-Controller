@@ -295,7 +295,7 @@ void loop()
 {
 
   // move through predefined positions
-  Move_Through_Positions();
+  // Move_Through_Positions();
 
   SPI_Controlled();
 }
