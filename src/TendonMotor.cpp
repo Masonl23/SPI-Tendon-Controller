@@ -272,6 +272,11 @@ void TendonController::Set_Angle(float destAngle)
     // calculate the error
     int32_t error = target_ticks - m_currentTicks;
 
+    if (abs(error) < 2){
+        Set_Direction(OFF);
+        return;
+    }
+
     // derivative
     float derivative = (error - m_error_prev) / deltaTime;
 

@@ -143,7 +143,7 @@ int angIndex = 0;
 // move through positions
 void Move_Through_Positions()
 {
-  if (millis() - lastTime > 600)
+  if (millis() - lastTime > 300)
   {
 
     Serial.print("\nTarget: ");
