@@ -67,6 +67,8 @@ public:
 
     void init_peripheral();
 
+    void Reset_Encoder_Zero();
+
     void Set_EncA_Flag();
 
     void Set_EncB_Flag();
