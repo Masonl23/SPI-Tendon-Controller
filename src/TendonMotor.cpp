@@ -269,8 +269,8 @@ float TendonController::Get_Angle()
 void TendonController::Set_Angle(float destAngle)
 {
     // grab current time
-    unsigned long curTime = micros();
-    unsigned long deltaTime = curTime - m_prevPIDTime;
+    float curTime = micros();
+    float deltaTime = curTime - m_prevPIDTime;
     deltaTime /= 1.0e6;
 
     // get number of encoders ticks needed to get to angle
@@ -306,11 +306,11 @@ void TendonController::Set_Angle(float destAngle)
         m_direction = CCW;
     }
 
-    if (!m_calibrated)
+    if (!m_calibrated)  // not calibrated
     {
-        m_cur_pwm = mapf(m_cur_pwm, 0, 6000, 2500, 6000);
+        m_cur_pwm = mapf(m_cur_pwm, 0, 6000, 1000, 6000);
     }
-    else
+    else    // each motor is calibrated
     {
         uint16_t min = sig < 0 ? m_min_CCW_PWM : m_min_CW_PWM;
         m_cur_pwm = mapf(m_cur_pwm, 0, 6000, min, 6000);

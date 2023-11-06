@@ -98,7 +98,7 @@ private:
     // pid stuff
     float m_kp, m_kd, m_ki, m_umax;
     float m_error_prev, m_error_integral;
-    unsigned long m_prevPIDTime = 0;
+    float m_prevPIDTime = 0;
     uint16_t m_chillBand = 0;
 
     // current pwm speed
