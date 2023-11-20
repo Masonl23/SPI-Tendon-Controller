@@ -177,7 +177,7 @@ void sercom1_spi_init(const ml_spi_opmode_t opmode)
     }
 
     // SERCOM1->SPI.CTRLC.bit.ICSPACE = 0x00;
-    SERCOM1->SPI.CTRLC.bit.DATA32B = true;
+    SERCOM1->SPI.CTRLC.bit.DATA32B = false;
 
     SERCOM1->SPI.BAUD.bit.BAUD = 0x32; // hex(50) = 0x32
 
@@ -246,13 +246,13 @@ const uint32_t sercom1_spi_rx_dmac_channel_settings =
      DMAC_CHCTRLA_TRIGACT_BURST);
 
 const uint16_t sercom1_spi_rx_master_dmac_descriptor_settings =
-    (DMAC_BTCTRL_BEATSIZE_WORD |
+    (DMAC_BTCTRL_BEATSIZE_BYTE |
      DMAC_BTCTRL_DSTINC |
      DMAC_BTCTRL_BLOCKACT_BOTH |
      DMAC_BTCTRL_VALID);
 
 const uint16_t sercom1_spi_rx_slave_dmac_descriptor_settings =
-    (DMAC_BTCTRL_BEATSIZE_WORD |
+    (DMAC_BTCTRL_BEATSIZE_BYTE |
      DMAC_BTCTRL_DSTINC |
      DMAC_BTCTRL_BLOCKACT_INT |
      DMAC_BTCTRL_VALID);
@@ -265,13 +265,13 @@ const uint32_t sercom1_spi_tx_dmac_channel_settings =
 const uint16_t sercom1_spi_tx_master_dmac_descriptor_settings =
     (DMAC_BTCTRL_VALID |
      DMAC_BTCTRL_BLOCKACT_BOTH |
-     DMAC_BTCTRL_BEATSIZE_WORD |
+     DMAC_BTCTRL_BEATSIZE_BYTE |
      DMAC_BTCTRL_SRCINC);
 
 const uint16_t sercom1_spi_tx_slave_dmac_descriptor_settings =
     (DMAC_BTCTRL_VALID |
      DMAC_BTCTRL_BLOCKACT_INT |
-     DMAC_BTCTRL_BEATSIZE_WORD |
+     DMAC_BTCTRL_BEATSIZE_BYTE |
      DMAC_BTCTRL_SRCINC);
 
 #define SERCOM1_SPI_DMAC_INTMSK (DMAC_CHINTENSET_TCMPL | DMAC_CHINTENSET_TERR)

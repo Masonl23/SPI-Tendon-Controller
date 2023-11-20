@@ -14,26 +14,26 @@ static DmacDescriptor base_descriptor[3] __attribute__((aligned(16)));
 static volatile DmacDescriptor wb_descriptor[3] __attribute__((aligned(16)));
 
 // allocated space for RX and TX buffers
-#define SPI_RX_BUFFER_LEN 6
-volatile uint32_t spi_rx_buffer[SPI_RX_BUFFER_LEN] =
-    {
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0x00000000,
+#define SPI_RX_BUFFER_LEN 12
+volatile uint8_t spi_rx_buffer[SPI_RX_BUFFER_LEN]={
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
 };
 
 #define SPI_TX_BUFFER_LEN 6
-volatile uint32_t spi_tx_buffer[SPI_TX_BUFFER_LEN] =
+volatile uint8_t spi_tx_buffer[SPI_TX_BUFFER_LEN] =
     {
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0x00000000,
+
 };
 
 // create SPI object
@@ -217,7 +217,7 @@ void setup()
     tendons[i].init_peripheral();
     tendons[i].Set_Direction(OFF);
     // tendons[i].Calibrate_Min_PWM();
-    tendons[i].Set_PID_Param(1000, 5, 0);
+    tendons[i].Set_PID_Param(900, 0, 10);
     // tendons[i].Set_Angle(270);
   }
 
@@ -273,12 +273,12 @@ void DMAC_0_Handler(void)
     dmac_rx_intflag = true;
     int index = spi_rx_buffer[0];
     // tendons[spi_rx_buffer[0]].Reset_Encoder_Zero();
-    spiMotorAngles[0] = (int32_t)spi_rx_buffer[1] / 10.0;
-    spiMotorAngles[1] = (int32_t)spi_rx_buffer[2] / 10.0;
-    spiMotorAngles[2] = (int32_t)spi_rx_buffer[3] / 10.0;
-    spiMotorAngles[3] = (int32_t)spi_rx_buffer[4] / 10.0;
-    spiMotorAngles[4] = (int32_t)spi_rx_buffer[5] / 10.0;
-    spiMotorAngles[5] = (int32_t)spi_rx_buffer[6] / 10.0;
+    spiMotorAngles[0] = (int32_t)spi_rx_buffer[0] / 10.0;
+    spiMotorAngles[1] = (int32_t)spi_rx_buffer[1] / 10.0;
+    spiMotorAngles[2] = (int32_t)spi_rx_buffer[2] / 10.0;
+    spiMotorAngles[3] = (int32_t)spi_rx_buffer[3] / 10.0;
+    spiMotorAngles[4] = (int32_t)spi_rx_buffer[4] / 10.0;
+    spiMotorAngles[5] = (int32_t)spi_rx_buffer[5] / 10.0;
   }
 }
 

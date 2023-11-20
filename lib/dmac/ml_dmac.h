@@ -36,7 +36,7 @@ typedef struct _ml_dmac_s
     uint8_t chan_prilvl;
 
     uint16_t ex_len;
-    volatile uint32_t const * ex_ptr;
+    volatile uint8_t const * ex_ptr;
     const uint16_t descriptor_settings;
     uint8_t intmsk;
 
