@@ -15,7 +15,7 @@ static volatile DmacDescriptor wb_descriptor[3] __attribute__((aligned(16)));
 
 // allocated space for RX and TX buffers
 #define SPI_RX_BUFFER_LEN 12
-volatile uint8_t spi_rx_buffer[SPI_RX_BUFFER_LEN]={
+volatile uint8_t spi_rx_buffer[SPI_RX_BUFFER_LEN] = {
     0x00,
     0x00,
     0x00,
@@ -30,10 +30,21 @@ volatile uint8_t spi_rx_buffer[SPI_RX_BUFFER_LEN]={
     0x00,
 };
 
-#define SPI_TX_BUFFER_LEN 6
+#define SPI_TX_BUFFER_LEN 12
 volatile uint8_t spi_tx_buffer[SPI_TX_BUFFER_LEN] =
     {
-
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
 };
 
 // create SPI object
@@ -184,6 +195,7 @@ void SPI_Controlled()
   tendons[3].Set_Angle(spiMotorAngles[3]);
   tendons[4].Set_Angle(spiMotorAngles[4]);
   tendons[5].Set_Angle(spiMotorAngles[5]);
+  
 }
 
 void setup()
@@ -271,14 +283,13 @@ void DMAC_0_Handler(void)
   {
     ML_DMAC_CHANNEL_CLR_TCMPL_INTFLAG(rx_dmac_chnum);
     dmac_rx_intflag = true;
-    int index = spi_rx_buffer[0];
-    // tendons[spi_rx_buffer[0]].Reset_Encoder_Zero();
-    spiMotorAngles[0] = (int32_t)spi_rx_buffer[0] / 10.0;
-    spiMotorAngles[1] = (int32_t)spi_rx_buffer[1] / 10.0;
-    spiMotorAngles[2] = (int32_t)spi_rx_buffer[2] / 10.0;
-    spiMotorAngles[3] = (int32_t)spi_rx_buffer[3] / 10.0;
-    spiMotorAngles[4] = (int32_t)spi_rx_buffer[4] / 10.0;
-    spiMotorAngles[5] = (int32_t)spi_rx_buffer[5] / 10.0;
+    spiMotorAngles[0] = int16_t(spi_rx_buffer[0] << 8 | spi_rx_buffer[1]);
+    spiMotorAngles[1] = int16_t(spi_rx_buffer[2] << 8 | spi_rx_buffer[3]);
+    spiMotorAngles[2] = int16_t(spi_rx_buffer[4] << 8 | spi_rx_buffer[5]);
+    spiMotorAngles[3] = int16_t(spi_rx_buffer[6] << 8 | spi_rx_buffer[7]);
+    spiMotorAngles[4] = int16_t(spi_rx_buffer[8] << 8 | spi_rx_buffer[9]);
+    spiMotorAngles[5] = int16_t(spi_rx_buffer[10] << 8 | spi_rx_buffer[11]);
+    Serial.println(spiMotorAngles[0]);
   }
 }
 
