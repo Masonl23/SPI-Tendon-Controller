@@ -14,8 +14,9 @@ static DmacDescriptor base_descriptor[3] __attribute__((aligned(16)));
 static volatile DmacDescriptor wb_descriptor[3] __attribute__((aligned(16)));
 
 // allocated space for RX and TX buffers
-#define SPI_RX_BUFFER_LEN 12
+#define SPI_RX_BUFFER_LEN 13
 volatile uint8_t spi_rx_buffer[SPI_RX_BUFFER_LEN] = {
+    0x00,
     0x00,
     0x00,
     0x00,
@@ -30,9 +31,10 @@ volatile uint8_t spi_rx_buffer[SPI_RX_BUFFER_LEN] = {
     0x00,
 };
 
-#define SPI_TX_BUFFER_LEN 12
+#define SPI_TX_BUFFER_LEN 13
 volatile uint8_t spi_tx_buffer[SPI_TX_BUFFER_LEN] =
     {
+        0x00,
         0x00,
         0x00,
         0x00,
@@ -283,13 +285,25 @@ void DMAC_0_Handler(void)
   {
     ML_DMAC_CHANNEL_CLR_TCMPL_INTFLAG(rx_dmac_chnum);
     dmac_rx_intflag = true;
-    spiMotorAngles[0] = int16_t(spi_rx_buffer[0] << 8 | spi_rx_buffer[1]);
-    spiMotorAngles[1] = int16_t(spi_rx_buffer[2] << 8 | spi_rx_buffer[3]);
-    spiMotorAngles[2] = int16_t(spi_rx_buffer[4] << 8 | spi_rx_buffer[5]);
-    spiMotorAngles[3] = int16_t(spi_rx_buffer[6] << 8 | spi_rx_buffer[7]);
-    spiMotorAngles[4] = int16_t(spi_rx_buffer[8] << 8 | spi_rx_buffer[9]);
-    spiMotorAngles[5] = int16_t(spi_rx_buffer[10] << 8 | spi_rx_buffer[11]);
-    Serial.println(spiMotorAngles[0]);
+    
+    // check if we need to reset an encoder zero
+    if (spi_rx_buffer[0] != 0){
+      for (byte i = 0; i < 6; i++){
+        // check if that index 
+        if (spi_rx_buffer[0] & (1 << i)){
+          tendons[i].Reset_Encoder_Zero();
+        }
+      }
+    }
+
+    // set the new angles from commanded
+    spiMotorAngles[0] = int16_t(spi_rx_buffer[1] << 8 | spi_rx_buffer[2]);
+    spiMotorAngles[1] = int16_t(spi_rx_buffer[3] << 8 | spi_rx_buffer[4]);
+    spiMotorAngles[2] = int16_t(spi_rx_buffer[5] << 8 | spi_rx_buffer[6]);
+    spiMotorAngles[3] = int16_t(spi_rx_buffer[7] << 8 | spi_rx_buffer[8]);
+    spiMotorAngles[4] = int16_t(spi_rx_buffer[9] << 8 | spi_rx_buffer[10]);
+    spiMotorAngles[5] = int16_t(spi_rx_buffer[11] << 8 | spi_rx_buffer[12]);
+    // Serial.println(spiMotorAngles[0]);
   }
 }
 
