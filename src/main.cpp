@@ -288,7 +288,7 @@ void DMAC_0_Handler(void)
     
     // check if we need to reset an encoder zero
     if (spi_rx_buffer[0] != 0){
-      tendons[spi_rx_buffer[0]].Reset_Encoder_Zero();
+      tendons[spi_rx_buffer[0]-1].Reset_Encoder_Zero();
     }
 
     // set the new angles from commanded
