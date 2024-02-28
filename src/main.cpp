@@ -14,8 +14,9 @@ static DmacDescriptor base_descriptor[3] __attribute__((aligned(16)));
 static volatile DmacDescriptor wb_descriptor[3] __attribute__((aligned(16)));
 
 // allocated space for RX and TX buffers
-#define SPI_RX_BUFFER_LEN 14
+#define SPI_RX_BUFFER_LEN 15
 volatile uint8_t spi_rx_buffer[SPI_RX_BUFFER_LEN] = {
+    0x00,
     0x00,
     0x00,
     0x00,
@@ -32,23 +33,24 @@ volatile uint8_t spi_rx_buffer[SPI_RX_BUFFER_LEN] = {
     0x00,
 };
 
-#define SPI_TX_BUFFER_LEN 14
+#define SPI_TX_BUFFER_LEN 15
 volatile uint8_t spi_tx_buffer[SPI_TX_BUFFER_LEN] =
     {
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
 };
 
 // create SPI object
