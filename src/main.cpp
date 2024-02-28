@@ -14,8 +14,9 @@ static DmacDescriptor base_descriptor[3] __attribute__((aligned(16)));
 static volatile DmacDescriptor wb_descriptor[3] __attribute__((aligned(16)));
 
 // allocated space for RX and TX buffers
-#define SPI_RX_BUFFER_LEN 13
+#define SPI_RX_BUFFER_LEN 14
 volatile uint8_t spi_rx_buffer[SPI_RX_BUFFER_LEN] = {
+    0x00,
     0x00,
     0x00,
     0x00,
@@ -31,9 +32,10 @@ volatile uint8_t spi_rx_buffer[SPI_RX_BUFFER_LEN] = {
     0x00,
 };
 
-#define SPI_TX_BUFFER_LEN 13
+#define SPI_TX_BUFFER_LEN 14
 volatile uint8_t spi_tx_buffer[SPI_TX_BUFFER_LEN] =
     {
+        0x00,
         0x00,
         0x00,
         0x00,
@@ -93,10 +95,10 @@ void dstack_a_init(void)
 }
 
 // create bunch of tendons
-#define NUM_TENDONS 6
+#define NUM_TENDONS 7
 
 float spiMotorAngles[NUM_TENDONS] = {
-    0, 0, 0, 0, 0, 0};
+    0, 0, 0, 0, 0, 0, 0};
 
 TendonController tendons[NUM_TENDONS] = {
     TendonController("motor 1"),
@@ -104,7 +106,8 @@ TendonController tendons[NUM_TENDONS] = {
     TendonController("motor 3"),
     TendonController("motor 4"),
     TendonController("motor 5"),
-    TendonController("motor 6")};
+    TendonController("motor 6"),
+    TendonController("motor 7")};
 
 void attach_tendons()
 {
@@ -143,50 +146,14 @@ void attach_tendons()
   tendons[5].Attach_Direction_Pin(PORT_GRP_C, 23, PF_B);
   tendons[5].Attach_EncA_Pin(PORT_GRP_A, 23, PF_A);
   tendons[5].Attach_EncB_Pin(PORT_GRP_D, 8, PF_A);
+
+  // motor 7
+  tendons[6].Attach_Drive_Pin(PORT_GRP_A, 12, PF_F, 6);
+  tendons[6].Attach_Direction_Pin(PORT_GRP_B, 24, PF_B);
+  tendons[6].Attach_EncA_Pin(PORT_GRP_C, 0, PF_A);
+  tendons[6].Attach_EncB_Pin(PORT_GRP_C, 1, PF_A);
 }
 
-unsigned long lastTime = 0;
-byte curState = 0;
-
-const int numAngles = 6;
-int angle1[numAngles] = {90, 120, 100, 90, 120, 60};
-int angle2[numAngles] = {100, 95, 60, 90, 105, 80};
-int angIndex = 0;
-
-// move through positions
-void Move_Through_Positions()
-{
-  if (millis() - lastTime > 300)
-  {
-
-    Serial.print("\nTarget: ");
-    Serial.println(angle1[angIndex]);
-    Serial.print("Motor 1: ");
-    Serial.println(tendons[0].Get_Angle());
-    Serial.print("Motor 2: ");
-    Serial.println(tendons[1].Get_Angle());
-    Serial.print("Motor 3: ");
-    Serial.println(tendons[2].Get_Angle());
-    Serial.print("Motor 4: ");
-    Serial.println(tendons[3].Get_Angle());
-    Serial.print("Motor 5: ");
-    Serial.println(tendons[4].Get_Angle());
-    Serial.print("Motor 6: ");
-    Serial.println(tendons[5].Get_Angle());
-    angIndex++;
-    if (angIndex > numAngles)
-    {
-      angIndex = 0;
-    }
-    lastTime = millis();
-  }
-  tendons[0].Set_Angle(angle1[angIndex]);
-  tendons[1].Set_Angle(angle1[angIndex]);
-  tendons[2].Set_Angle(angle1[angIndex]);
-  tendons[3].Set_Angle(angle1[angIndex]);
-  tendons[4].Set_Angle(angle1[angIndex]);
-  tendons[5].Set_Angle(angle1[angIndex]);
-}
 
 void SPI_Controlled()
 {
@@ -197,16 +164,14 @@ void SPI_Controlled()
   tendons[3].Set_Angle(spiMotorAngles[3]);
   tendons[4].Set_Angle(spiMotorAngles[4]);
   tendons[5].Set_Angle(spiMotorAngles[5]);
-  
+  tendons[6].Set_Angle(spiMotorAngles[6]);
 }
 
 void setup()
 {
   // start serial comm for debugging
   Serial.begin(9600);
-  // while (!Serial)
-  //   ;
-  // ;
+
   Serial.println("Starting");
 
   // start clocks
@@ -225,14 +190,13 @@ void setup()
 
   // attach pins to tendon object
   attach_tendons();
+
   // intialize objects
   for (int i = 0; i < NUM_TENDONS; i++)
   {
     tendons[i].init_peripheral();
     tendons[i].Set_Direction(OFF);
-    // tendons[i].Calibrate_Min_PWM();
     tendons[i].Set_PID_Param(900, 0, 10);
-    // tendons[i].Set_Angle(270);
   }
 
   // good measure why not start the TCC0 again..
@@ -298,7 +262,7 @@ void DMAC_0_Handler(void)
     spiMotorAngles[3] = int16_t(spi_rx_buffer[7] << 8 | spi_rx_buffer[8]);
     spiMotorAngles[4] = int16_t(spi_rx_buffer[9] << 8 | spi_rx_buffer[10]);
     spiMotorAngles[5] = int16_t(spi_rx_buffer[11] << 8 | spi_rx_buffer[12]);
-    // Serial.println(spiMotorAngles[0]);
+    spiMotorAngles[6] = int16_t(spi_rx_buffer[13] << 8 | spi_rx_buffer[14]);
   }
 }
 
@@ -342,8 +306,12 @@ void loop()
  * M5:
  *      enca: D30 --> PA23 --> EXTINT[7]
  *      encb: D51 --> PD08 --> EXTINT[3]
+ * M6:
+ *      enca: A3 --> PC00 --> EXTINT[0]
+ *      encb: A4 --> PC01 --> EXTINT[1]
  */
 
+// M0
 //  *      enca: D40 --> PC13 --> EXTINT[13]
 //  *      encb: D41 --> PC12 --> EXTINT[12]
 void EIC_13_Handler(void)
@@ -357,6 +325,7 @@ void EIC_12_Handler(void)
   tendons[0].encoder_ISR();
 }
 
+//M1
 //  *      enca: D42 --> PC15 --> EXTINT[15]
 //  *      encb: D43 --> PC14 --> EXTINT[14]
 void EIC_15_Handler(void)
@@ -370,6 +339,7 @@ void EIC_14_Handler(void)
   tendons[1].encoder_ISR();
 }
 
+// M2
 //  *      enca: D44 --> PC11 --> EXTINT[11]
 //  *      encb: D45 --> PC10 --> EXTINT[10]
 void EIC_11_Handler(void)
@@ -383,6 +353,7 @@ void EIC_10_Handler(void)
   tendons[2].encoder_ISR();
 }
 
+// M3
 //  *      enca: D46 --> PC06 --> EXTINT[6]
 //  *      encb: D47 --> PC07 --> EXTINT[9]
 void EIC_6_Handler(void)
@@ -396,6 +367,7 @@ void EIC_9_Handler(void)
   tendons[3].encoder_ISR();
 }
 
+// M4
 //  *      enca: D48 --> PC04 --> EXTINT[4]
 //  *      encb: D49 --> PC05 --> EXTINT[5]
 void EIC_4_Handler(void)
@@ -409,6 +381,7 @@ void EIC_5_Handler(void)
   tendons[4].encoder_ISR();
 }
 
+// M5
 //  *      enca: D30 --> PA23 --> EXTINT[7]
 //  *      encb: D51 --> PD08 --> EXTINT[3]
 void EIC_7_Handler(void)
@@ -420,4 +393,16 @@ void EIC_3_Handler(void)
 {
   EIC_CLR_INTFLAG(3);
   tendons[5].encoder_ISR();
+}
+
+// M6
+void EIC_1_Handler(void)
+{
+  EIC_CLR_INTFLAG(1);
+  tendons[6].encoder_ISR();
+}
+void EIC_0_Handler(void)
+{
+  EIC_CLR_INTFLAG(0);
+  tendons[6].encoder_ISR();
 }
