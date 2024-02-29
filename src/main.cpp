@@ -36,22 +36,24 @@ volatile uint8_t spi_rx_buffer[SPI_RX_BUFFER_LEN] = {
 #define SPI_TX_BUFFER_LEN 15
 volatile uint8_t spi_tx_buffer[SPI_TX_BUFFER_LEN] =
     {
-    0x00,
-    0x00,
-    0x00,
-    0x00,
-    0x00,
-    0x00,
-    0x00,
-    0x00,
-    0x00,
-    0x00,
-    0x00,
-    0x00,
-    0x00,
-    0x00,
-    0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
 };
+
+char serial_buf[SPI_RX_BUFFER_LEN];
 
 // create SPI object
 ml_spi_s spi_s = sercom1_spi_dmac_slave_prototype;
@@ -99,7 +101,7 @@ void dstack_a_init(void)
 // create bunch of tendons
 #define NUM_TENDONS 7
 
-float spiMotorAngles[NUM_TENDONS] = {
+int16_t target_motor_angles[NUM_TENDONS] = {
     0, 0, 0, 0, 0, 0, 0};
 
 TendonController tendons[NUM_TENDONS] = {
@@ -157,22 +159,41 @@ void attach_tendons()
 }
 
 
-void SPI_Controlled()
+void uart_controlled()
 {
-  // set the target angle to value received from SPI
-  tendons[0].Set_Angle(spiMotorAngles[0]);
-  tendons[1].Set_Angle(spiMotorAngles[1]);
-  tendons[2].Set_Angle(spiMotorAngles[2]);
-  tendons[3].Set_Angle(spiMotorAngles[3]);
-  tendons[4].Set_Angle(spiMotorAngles[4]);
-  tendons[5].Set_Angle(spiMotorAngles[5]);
-  tendons[6].Set_Angle(spiMotorAngles[6]);
+  if (Serial.available() >= SPI_RX_BUFFER_LEN)
+  {
+    Serial.println("Got data..");
+    Serial.readBytes(serial_buf, SPI_RX_BUFFER_LEN);
+
+    // if first byte is not a zero then we need to reset an encoders position
+    if (serial_buf[0] != 0)
+    {
+      tendons[uint8_t(serial_buf[0]) - 1].Reset_Encoder_Zero();
+    }
+
+    target_motor_angles[0] = int16_t(serial_buf[1] << 8 | serial_buf[2]);
+    target_motor_angles[1] = int16_t(serial_buf[3] << 8 | serial_buf[4]);
+    target_motor_angles[2] = int16_t(serial_buf[5] << 8 | serial_buf[6]);
+    target_motor_angles[3] = int16_t(serial_buf[7] << 8 | serial_buf[8]);
+    target_motor_angles[4] = int16_t(serial_buf[9] << 8 | serial_buf[10]);
+    target_motor_angles[5] = int16_t(serial_buf[11] << 8 | serial_buf[12]);
+    target_motor_angles[6] = int16_t(serial_buf[13] << 8 | serial_buf[14]);
+
+    // debugging print the angles
+    for (int i = 0; i < NUM_TENDONS; i++)
+    {
+      Serial.print("Motor: ");
+      Serial.print(target_motor_angles[i]);
+      Serial.print(" ");
+    }
+  }
 }
 
 void setup()
 {
   // start serial comm for debugging
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   Serial.println("Starting");
 
@@ -251,20 +272,21 @@ void DMAC_0_Handler(void)
   {
     ML_DMAC_CHANNEL_CLR_TCMPL_INTFLAG(rx_dmac_chnum);
     dmac_rx_intflag = true;
-    
+
     // check if we need to reset an encoder zero
-    if (spi_rx_buffer[0] != 0){
-      tendons[spi_rx_buffer[0]-1].Reset_Encoder_Zero();
+    if (spi_rx_buffer[0] != 0)
+    {
+      tendons[spi_rx_buffer[0] - 1].Reset_Encoder_Zero();
     }
 
     // set the new angles from commanded
-    spiMotorAngles[0] = int16_t(spi_rx_buffer[1] << 8 | spi_rx_buffer[2]);
-    spiMotorAngles[1] = int16_t(spi_rx_buffer[3] << 8 | spi_rx_buffer[4]);
-    spiMotorAngles[2] = int16_t(spi_rx_buffer[5] << 8 | spi_rx_buffer[6]);
-    spiMotorAngles[3] = int16_t(spi_rx_buffer[7] << 8 | spi_rx_buffer[8]);
-    spiMotorAngles[4] = int16_t(spi_rx_buffer[9] << 8 | spi_rx_buffer[10]);
-    spiMotorAngles[5] = int16_t(spi_rx_buffer[11] << 8 | spi_rx_buffer[12]);
-    spiMotorAngles[6] = int16_t(spi_rx_buffer[13] << 8 | spi_rx_buffer[14]);
+    target_motor_angles[0] = int16_t(spi_rx_buffer[1] << 8 | spi_rx_buffer[2]);
+    target_motor_angles[1] = int16_t(spi_rx_buffer[3] << 8 | spi_rx_buffer[4]);
+    target_motor_angles[2] = int16_t(spi_rx_buffer[5] << 8 | spi_rx_buffer[6]);
+    target_motor_angles[3] = int16_t(spi_rx_buffer[7] << 8 | spi_rx_buffer[8]);
+    target_motor_angles[4] = int16_t(spi_rx_buffer[9] << 8 | spi_rx_buffer[10]);
+    target_motor_angles[5] = int16_t(spi_rx_buffer[11] << 8 | spi_rx_buffer[12]);
+    target_motor_angles[6] = int16_t(spi_rx_buffer[13] << 8 | spi_rx_buffer[14]);
   }
 }
 
@@ -280,15 +302,25 @@ void DMAC_1_Handler(void)
   }
 }
 
+
 void loop()
 {
+  // to test
+  // uart_controlled();
 
-  // move through predefined positions
-  // Move_Through_Positions();
-
-  SPI_Controlled();
+  // set the target angle
+  tendons[0].Set_Angle(target_motor_angles[0]);
+  tendons[1].Set_Angle(target_motor_angles[1]);
+  tendons[2].Set_Angle(target_motor_angles[2]);
+  tendons[3].Set_Angle(target_motor_angles[3]);
+  tendons[4].Set_Angle(target_motor_angles[4]);
+  tendons[5].Set_Angle(target_motor_angles[5]);
+  tendons[6].Set_Angle(target_motor_angles[6]);
 }
 
+
+//-----------------------------------------------------------------
+// setting up interrupts
 /*
  * M0:
  *      enca: D40 --> PC13 --> EXTINT[13]
@@ -327,9 +359,9 @@ void EIC_12_Handler(void)
   tendons[0].encoder_ISR();
 }
 
-//M1
-//  *      enca: D42 --> PC15 --> EXTINT[15]
-//  *      encb: D43 --> PC14 --> EXTINT[14]
+// M1
+//   *      enca: D42 --> PC15 --> EXTINT[15]
+//   *      encb: D43 --> PC14 --> EXTINT[14]
 void EIC_15_Handler(void)
 {
   EIC_CLR_INTFLAG(15);
