@@ -169,7 +169,13 @@ void uart_controlled()
     // if first byte is not a zero then we need to reset an encoders position
     if (serial_buf[0] != 0)
     {
-      tendons[uint8_t(serial_buf[0]) - 1].Reset_Encoder_Zero();
+      tendons[uint8_t(serial_buf[0]&0xf) - 1].Reset_Encoder_Zero();
+
+      // asking for an ack so send a one back
+      // if(serial_buf[0]&0b10000000){
+      //   Serial.write(1);
+      //   return;
+      // }
     }
 
     target_motor_angles[0] = int16_t(serial_buf[1] << 8 | serial_buf[2]);
@@ -306,7 +312,7 @@ void DMAC_1_Handler(void)
 void loop()
 {
   // to test
-  // uart_controlled();
+  uart_controlled();
 
   // set the target angle
   tendons[0].Set_Angle(target_motor_angles[0]);
