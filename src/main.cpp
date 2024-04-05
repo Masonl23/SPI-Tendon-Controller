@@ -163,19 +163,13 @@ void uart_controlled()
 {
   if (Serial.available() >= SPI_RX_BUFFER_LEN)
   {
-    Serial.println("Got data..");
+    // Serial.println("Got data..");
     Serial.readBytes(serial_buf, SPI_RX_BUFFER_LEN);
 
     // if first byte is not a zero then we need to reset an encoders position
     if (serial_buf[0] != 0)
     {
       tendons[uint8_t(serial_buf[0]&0xf) - 1].Reset_Encoder_Zero();
-
-      // asking for an ack so send a one back
-      // if(serial_buf[0]&0b10000000){
-      //   Serial.write(1);
-      //   return;
-      // }
     }
 
     target_motor_angles[0] = int16_t(serial_buf[1] << 8 | serial_buf[2]);
@@ -186,13 +180,13 @@ void uart_controlled()
     target_motor_angles[5] = int16_t(serial_buf[11] << 8 | serial_buf[12]);
     target_motor_angles[6] = int16_t(serial_buf[13] << 8 | serial_buf[14]);
 
-    // debugging print the angles
-    for (int i = 0; i < NUM_TENDONS; i++)
-    {
-      Serial.print("Motor: ");
-      Serial.print(target_motor_angles[i]);
-      Serial.print(" ");
-    }
+    // // debugging print the angles
+    // for (int i = 0; i < NUM_TENDONS; i++)
+    // {
+    //   Serial.print("Motor: ");
+    //   Serial.print(target_motor_angles[i]);
+    //   Serial.print(" ");
+    // }
   }
 }
 
@@ -200,7 +194,7 @@ void setup()
 {
   // start serial comm for debugging
   Serial.begin(115200);
-
+  while(!Serial);;
   Serial.println("Starting");
 
   // start clocks
@@ -226,11 +220,16 @@ void setup()
     tendons[i].init_peripheral();
     tendons[i].Set_Direction(OFF);
     tendons[i].Set_PID_Param(900, 0, 10);
+    // tendons[i].CalibrateLimits();
   }
 
   // good measure why not start the TCC0 again..
   TCC_ENABLE(TCC0);
   TCC_sync(TCC0);
+  
+    // tendons[0].CalibrateLimits();
+    // tendons[1].CalibrateLimits();
+    // tendons[2].CalibrateLimits();
 
   /**
    * SPI STUFF

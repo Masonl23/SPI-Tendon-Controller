@@ -9,6 +9,9 @@
 
 #define ML_ENC_CPR (12)
 
+#define ENC_DEG_TO_TICKS(deg) (deg * ML_ENC_CPR * ML_HPCB_LV_75P1) / 360.0
+#define ENC_TICK_TO_DEG(ticks) ((360.0*(float)ticks)/((float)ML_ENC_CPR*ML_HPCB_LV_75P1))
+
 
 // direction motor should turn
 typedef enum
@@ -51,7 +54,7 @@ public:
     void Toggle_Direction();
 
     // move tendon to angle
-    void Set_Angle(float destAngle);
+    void Set_Angle(float destAngle, float MAX_PWM = 6000);
 
     // angles of tendon
     void Set_Start_Angle_Limit(float angle);
@@ -68,6 +71,8 @@ public:
     void init_peripheral();
 
     void Reset_Encoder_Zero();
+
+    void CalibrateLimits();
 
     void Set_EncA_Flag();
 
@@ -94,6 +99,8 @@ private:
     // encoder values
     int16_t m_lastTicks = 0;
     float m_angle = 0;
+    int32_t m_target_ticks = 0;
+    bool m_settled = false;
 
     // pid stuff
     float m_kp, m_kd, m_ki, m_umax;

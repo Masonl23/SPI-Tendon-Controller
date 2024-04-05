@@ -263,10 +263,68 @@ float TendonController::Get_Angle()
     return ((360.0 * m_currentTicks) / (m_cycles_per_rev * m_gear_ratio));
 }
 
+
+float ConvertAngle(int16_t ticks){
+    return ((360.0 * ticks) / (ML_ENC_CPR * ML_HPCB_LV_75P1));
+}
+
+void TendonController::CalibrateLimits(){
+    int16_t min_limit = 0;
+    int16_t max_limit = 0;
+
+    Serial.println("Calibrating");
+    float freq_pwm  = 2600;
+
+
+    Set_Direction(CCW);
+    set_PWM_Freq(freq_pwm);
+    int16_t curAngle = 10;
+    while (curAngle != m_currentTicks){
+        curAngle = m_currentTicks;
+        Serial.printf("Finding min: %.3f\n",ConvertAngle(curAngle));
+        delay(200);
+    }
+    Serial.printf("Found min: %.3f\n",ConvertAngle(curAngle));
+    min_limit = curAngle;
+    Reset_Encoder_Zero();
+
+
+    Set_Direction(CW);
+    set_PWM_Freq(freq_pwm);
+    curAngle = 10;
+    while (curAngle != m_currentTicks){
+        curAngle = m_currentTicks;
+        Serial.printf("Finding max: %.3f\n",ConvertAngle(curAngle));
+        delay(200);
+    }
+    Serial.printf("Found max: %.3f\n",ConvertAngle(curAngle));
+
+    max_limit = curAngle;
+
+
+
+    int16_t center = abs(max_limit)-abs(min_limit);
+
+    float min_angle = ConvertAngle(min_limit);
+    float max_angle = ConvertAngle(max_limit);
+    float center_angle = max_angle/2;
+
+
+    Serial.printf("Min: %f Max: %f Center: %f \n",min_angle,max_angle,center_angle);
+    Set_Direction(OFF);
+
+    unsigned long starttime = millis();
+    while(millis() - starttime < 500){
+        Set_Angle(center_angle,freq_pwm);
+    }
+    Reset_Encoder_Zero();
+    Serial.println("Calibration complete");
+}
+
 /**
  * Set target angle
  */
-void TendonController::Set_Angle(float destAngle)
+void TendonController::Set_Angle(float destAngle,float MAX_PWM)
 {
     // grab current time
     float curTime = micros();
@@ -274,18 +332,20 @@ void TendonController::Set_Angle(float destAngle)
     deltaTime /= 1.0e6;
 
     // get number of encoders ticks needed to get to angle
-    int32_t target_ticks = (destAngle * m_cycles_per_rev * m_gear_ratio) / 360.0;
+    m_target_ticks = (destAngle * m_cycles_per_rev * m_gear_ratio) / 360.0;
 
     // calculate the error
-    int32_t error = target_ticks - m_currentTicks;
+    int32_t error = m_target_ticks - m_currentTicks;
 
     if (abs(error) < 2)
     {
         Set_Direction(OFF);
         m_prevPIDTime = curTime;
         m_error_integral = 0;
+        m_settled = true;
         return;
     }
+    m_settled = false;
 
     // derivative
     float derivative = (error - m_error_prev) / deltaTime;
@@ -308,12 +368,12 @@ void TendonController::Set_Angle(float destAngle)
 
     if (!m_calibrated)  // not calibrated
     {
-        m_cur_pwm = mapf(m_cur_pwm, 0, 6000, 1000, 6000);
+        m_cur_pwm = mapf(m_cur_pwm, 0, 6000, 1000, MAX_PWM);
     }
     else    // each motor is calibrated
     {
         uint16_t min = sig < 0 ? m_min_CCW_PWM : m_min_CW_PWM;
-        m_cur_pwm = mapf(m_cur_pwm, 0, 6000, min, 6000);
+        m_cur_pwm = mapf(m_cur_pwm, 0, 6000, min, MAX_PWM);
     }
 
     if (m_cur_pwm > m_tcc_freq)
