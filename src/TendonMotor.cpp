@@ -268,6 +268,25 @@ float ConvertAngle(int16_t ticks){
     return ((360.0 * ticks) / (ML_ENC_CPR * ML_HPCB_LV_75P1));
 }
 
+void TendonController::Move_To_End(bool cw){
+    float pwm_freq = 1500;
+    set_PWM_Freq(pwm_freq);
+    if (cw){
+        Set_Direction(CW);
+    }
+    else{
+        Set_Direction(CCW);
+    }
+    int32_t curAngle = m_currentTicks + 100;
+
+    while (curAngle != m_currentTicks){
+        curAngle = m_currentTicks;
+        delay(500);
+    }
+    Set_Direction(OFF);
+    Reset_Encoder_Zero();
+}
+
 void TendonController::CalibrateLimits(){
     int16_t min_limit = 0;
     int16_t max_limit = 0;

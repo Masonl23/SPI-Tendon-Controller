@@ -115,29 +115,35 @@ TendonController tendons[NUM_TENDONS] = {
 
 void attach_tendons()
 {
+
+  // left
   // motor 1
   tendons[0].Attach_Drive_Pin(PORT_GRP_C, 20, PF_F, 4);
   tendons[0].Attach_Direction_Pin(PORT_GRP_B, 16, PF_B);
   tendons[0].Attach_EncA_Pin(PORT_GRP_C, 13, PF_A);
   tendons[0].Attach_EncB_Pin(PORT_GRP_C, 12, PF_A);
+  tendons[0].m_gear_ratio = ML_HPCB_LV_100P1;
 
   // motor 2
   tendons[1].Attach_Drive_Pin(PORT_GRP_C, 21, PF_F, 5);
   tendons[1].Attach_Direction_Pin(PORT_GRP_B, 17, PF_B);
-  tendons[1].Attach_EncA_Pin(PORT_GRP_C, 15, PF_A);
-  tendons[1].Attach_EncB_Pin(PORT_GRP_C, 14, PF_A);
+  tendons[1].Attach_EncB_Pin(PORT_GRP_C, 15, PF_A);
+  tendons[1].Attach_EncA_Pin(PORT_GRP_C, 14, PF_A);
+  tendons[1].m_gear_ratio = ML_HPCB_LV_100P1;
 
   // motor 3
   tendons[2].Attach_Drive_Pin(PORT_GRP_C, 16, PF_F, 0);
   tendons[2].Attach_Direction_Pin(PORT_GRP_B, 20, PF_B);
   tendons[2].Attach_EncA_Pin(PORT_GRP_C, 11, PF_A);
   tendons[2].Attach_EncB_Pin(PORT_GRP_C, 10, PF_A);
+  tendons[2].m_gear_ratio = ML_HPCB_LV_100P1;
 
   // motor 4
   tendons[3].Attach_Drive_Pin(PORT_GRP_C, 17, PF_F, 1);
   tendons[3].Attach_Direction_Pin(PORT_GRP_B, 21, PF_B);
-  tendons[3].Attach_EncA_Pin(PORT_GRP_C, 7, PF_A);
-  tendons[3].Attach_EncB_Pin(PORT_GRP_C, 6, PF_A);
+  tendons[3].Attach_EncB_Pin(PORT_GRP_C, 7, PF_A);
+  tendons[3].Attach_EncA_Pin(PORT_GRP_C, 6, PF_A);
+  tendons[3].m_gear_ratio = ML_HPCB_LV_100P1;
 
   // motor 5
   tendons[4].Attach_Drive_Pin(PORT_GRP_C, 19, PF_F, 3);
@@ -148,16 +154,65 @@ void attach_tendons()
   // motor 6
   tendons[5].Attach_Drive_Pin(PORT_GRP_C, 18, PF_F, 2);
   tendons[5].Attach_Direction_Pin(PORT_GRP_C, 23, PF_B);
-  tendons[5].Attach_EncA_Pin(PORT_GRP_A, 23, PF_A);
-  tendons[5].Attach_EncB_Pin(PORT_GRP_D, 8, PF_A);
+  tendons[5].Attach_EncB_Pin(PORT_GRP_A, 23, PF_A);
+  tendons[5].Attach_EncA_Pin(PORT_GRP_D, 8, PF_A);
 
   // motor 7
   tendons[6].Attach_Drive_Pin(PORT_GRP_A, 12, PF_F, 6);
   tendons[6].Attach_Direction_Pin(PORT_GRP_B, 24, PF_B);
   tendons[6].Attach_EncA_Pin(PORT_GRP_C, 0, PF_A);
   tendons[6].Attach_EncB_Pin(PORT_GRP_C, 1, PF_A);
-}
 
+
+// RIGHT
+  // MOTORS 9-16
+  // motor 1
+  // tendons[0].Attach_Drive_Pin(PORT_GRP_C, 20, PF_F, 4);
+  // tendons[0].Attach_Direction_Pin(PORT_GRP_B, 16, PF_B);
+  // tendons[0].Attach_EncA_Pin(PORT_GRP_C, 13, PF_A);
+  // tendons[0].Attach_EncB_Pin(PORT_GRP_C, 12, PF_A);
+
+  // // motor 2
+  // tendons[1].Attach_Drive_Pin(PORT_GRP_C, 21, PF_F, 5);
+  // tendons[1].Attach_Direction_Pin(PORT_GRP_B, 17, PF_B);
+  // tendons[1].Attach_EncB_Pin(PORT_GRP_C, 15, PF_A);
+  // tendons[1].Attach_EncA_Pin(PORT_GRP_C, 14, PF_A);
+  // tendons[1].m_gear_ratio = ML_HPCB_LV_100P1;
+
+  // // motor 3
+  // tendons[2].Attach_Drive_Pin(PORT_GRP_C, 16, PF_F, 0);
+  // tendons[2].Attach_Direction_Pin(PORT_GRP_B, 20, PF_B);
+  // tendons[2].Attach_EncA_Pin(PORT_GRP_C, 11, PF_A);
+  // tendons[2].Attach_EncB_Pin(PORT_GRP_C, 10, PF_A);
+  // tendons[2].m_gear_ratio = ML_HPCB_LV_100P1;
+
+  // // motor 4
+  // tendons[3].Attach_Drive_Pin(PORT_GRP_C, 17, PF_F, 1);
+  // tendons[3].Attach_Direction_Pin(PORT_GRP_B, 21, PF_B);
+  // tendons[3].Attach_EncB_Pin(PORT_GRP_C, 7, PF_A);
+  // tendons[3].Attach_EncA_Pin(PORT_GRP_C, 6, PF_A);
+  // // tendons[3].m_gear_ratio = ML_HPCB_LV_100P1;
+
+  // // motor 5
+  // tendons[4].Attach_Drive_Pin(PORT_GRP_C, 19, PF_F, 3);
+  // tendons[4].Attach_Direction_Pin(PORT_GRP_C, 22, PF_B);
+  // tendons[4].Attach_EncB_Pin(PORT_GRP_C, 4, PF_A);
+  // tendons[4].Attach_EncA_Pin(PORT_GRP_C, 5, PF_A);
+  // tendons[4].m_gear_ratio = ML_HPCB_LV_100P1;
+
+  // // motor 6
+  // tendons[5].Attach_Drive_Pin(PORT_GRP_C, 18, PF_F, 2);
+  // tendons[5].Attach_Direction_Pin(PORT_GRP_C, 23, PF_B);
+  // tendons[5].Attach_EncB_Pin(PORT_GRP_A, 23, PF_A);
+  // tendons[5].Attach_EncA_Pin(PORT_GRP_D, 8, PF_A);
+  // tendons[5].m_gear_ratio = ML_HPCB_LV_100P1;
+
+  // // motor 7
+  // tendons[6].Attach_Drive_Pin(PORT_GRP_A, 12, PF_F, 6);
+  // tendons[6].Attach_Direction_Pin(PORT_GRP_B, 24, PF_B);
+  // tendons[6].Attach_EncA_Pin(PORT_GRP_C, 0, PF_A);
+  // tendons[6].Attach_EncB_Pin(PORT_GRP_C, 1, PF_A);
+}
 
 void uart_controlled()
 {
@@ -169,7 +224,7 @@ void uart_controlled()
     // if first byte is not a zero then we need to reset an encoders position
     if (serial_buf[0] != 0)
     {
-      tendons[uint8_t(serial_buf[0]&0xf) - 1].Reset_Encoder_Zero();
+      tendons[uint8_t(serial_buf[0] & 0b00000111)].Reset_Encoder_Zero();
     }
 
     target_motor_angles[0] = int16_t(serial_buf[1] << 8 | serial_buf[2]);
@@ -179,14 +234,6 @@ void uart_controlled()
     target_motor_angles[4] = int16_t(serial_buf[9] << 8 | serial_buf[10]);
     target_motor_angles[5] = int16_t(serial_buf[11] << 8 | serial_buf[12]);
     target_motor_angles[6] = int16_t(serial_buf[13] << 8 | serial_buf[14]);
-
-    // // debugging print the angles
-    // for (int i = 0; i < NUM_TENDONS; i++)
-    // {
-    //   Serial.print("Motor: ");
-    //   Serial.print(target_motor_angles[i]);
-    //   Serial.print(" ");
-    // }
   }
 }
 
@@ -194,7 +241,7 @@ void setup()
 {
   // start serial comm for debugging
   Serial.begin(115200);
-  while(!Serial);;
+  // while(!Serial);;
   Serial.println("Starting");
 
   // start clocks
@@ -226,10 +273,10 @@ void setup()
   // good measure why not start the TCC0 again..
   TCC_ENABLE(TCC0);
   TCC_sync(TCC0);
-  
-    // tendons[0].CalibrateLimits();
-    // tendons[1].CalibrateLimits();
-    // tendons[2].CalibrateLimits();
+
+  // tendons[0].CalibrateLimits();
+  // tendons[1].CalibrateLimits();
+  // tendons[2].CalibrateLimits();
 
   /**
    * SPI STUFF
@@ -275,13 +322,38 @@ void DMAC_0_Handler(void)
 {
   if (ML_DMAC_CHANNEL_TCMPL_INTFLAG(rx_dmac_chnum))
   {
-    ML_DMAC_CHANNEL_CLR_TCMPL_INTFLAG(rx_dmac_chnum);
-    dmac_rx_intflag = true;
 
-    // check if we need to reset an encoder zero
-    if (spi_rx_buffer[0] != 0)
+    if (spi_rx_buffer[0] & 0x80) // check if we need to reset an encoder zero
     {
-      tendons[spi_rx_buffer[0] - 1].Reset_Encoder_Zero();
+
+      uint8_t index = spi_rx_buffer[0] & 0b00000111;
+      if (index > NUM_TENDONS)
+      {
+        ML_DMAC_CHANNEL_CLR_TCMPL_INTFLAG(rx_dmac_chnum);
+        dmac_rx_intflag = true;
+        return; // added
+      }
+      tendons[index].Reset_Encoder_Zero();
+      target_motor_angles[index] = 0;
+      // ML_DMAC_CHANNEL_CLR_TCMPL_INTFLAG(rx_dmac_chnum);
+      // dmac_rx_intflag = true;
+      // return; // added
+    }
+    else if (spi_rx_buffer[0] & 0x40)
+    { // home a motor
+      uint8_t index = spi_rx_buffer[0] & 0b00000111;
+      if (index > NUM_TENDONS)
+      {
+        ML_DMAC_CHANNEL_CLR_TCMPL_INTFLAG(rx_dmac_chnum);
+        dmac_rx_intflag = true;
+        return; // added
+      }
+
+      tendons[index].Move_To_End(spi_rx_buffer[0]&0b00100000);
+      target_motor_angles[index] = 0;
+      // ML_DMAC_CHANNEL_CLR_TCMPL_INTFLAG(rx_dmac_chnum);
+      // dmac_rx_intflag = true;
+      // return;
     }
 
     // set the new angles from commanded
@@ -292,6 +364,9 @@ void DMAC_0_Handler(void)
     target_motor_angles[4] = int16_t(spi_rx_buffer[9] << 8 | spi_rx_buffer[10]);
     target_motor_angles[5] = int16_t(spi_rx_buffer[11] << 8 | spi_rx_buffer[12]);
     target_motor_angles[6] = int16_t(spi_rx_buffer[13] << 8 | spi_rx_buffer[14]);
+
+    ML_DMAC_CHANNEL_CLR_TCMPL_INTFLAG(rx_dmac_chnum);
+    dmac_rx_intflag = true;
   }
 }
 
@@ -307,7 +382,6 @@ void DMAC_1_Handler(void)
   }
 }
 
-
 void loop()
 {
   // to test
@@ -322,7 +396,6 @@ void loop()
   tendons[5].Set_Angle(target_motor_angles[5]);
   tendons[6].Set_Angle(target_motor_angles[6]);
 }
-
 
 //-----------------------------------------------------------------
 // setting up interrupts
@@ -445,3 +518,15 @@ void EIC_0_Handler(void)
   EIC_CLR_INTFLAG(0);
   tendons[6].encoder_ISR();
 }
+
+// // M6
+// void EIC_2_Handler(void)
+// {
+//   EIC_CLR_INTFLAG(1);
+//   tendons[6].encoder_ISR();
+// }
+// void EIC_8_Handler(void)
+// {
+//   EIC_CLR_INTFLAG(0);
+//   tendons[6].encoder_ISR();
+// }

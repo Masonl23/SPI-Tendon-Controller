@@ -94,11 +94,12 @@ void encoder_extint_init(void)
     // NVIC_SetPriority(EIC_13_IRQn, 0xFF);
     // NVIC_SetPriority(EIC_14_IRQn, 0xFF);
     // NVIC_SetPriority(EIC_15_IRQn, 0xFF);
+
     EIC->CONFIG[0].reg = 
     (
         EIC_CONFIG_FILTEN0 |
         EIC_CONFIG_FILTEN1 |
-        EIC_CONFIG_FILTEN2 |
+        // EIC_CONFIG_FILTEN2 |
         EIC_CONFIG_FILTEN3 |
         EIC_CONFIG_FILTEN4 |
         EIC_CONFIG_FILTEN5 |
@@ -110,7 +111,7 @@ void encoder_extint_init(void)
     (
         EIC_CONFIG_SENSE0_BOTH |
         EIC_CONFIG_SENSE1_BOTH |
-        EIC_CONFIG_SENSE2_BOTH |
+        // EIC_CONFIG_SENSE2_BOTH |
         EIC_CONFIG_SENSE3_BOTH |
         EIC_CONFIG_SENSE4_BOTH |
         EIC_CONFIG_SENSE5_BOTH |
@@ -120,7 +121,7 @@ void encoder_extint_init(void)
 
     EIC->CONFIG[1].reg = 
     (
-        EIC_CONFIG_FILTEN0 |
+        // EIC_CONFIG_FILTEN0 |
         EIC_CONFIG_FILTEN1 |
         EIC_CONFIG_FILTEN2 |
         EIC_CONFIG_FILTEN3 |
@@ -132,7 +133,7 @@ void encoder_extint_init(void)
 
     EIC->CONFIG[1].reg |= 
     (
-        EIC_CONFIG_SENSE0_BOTH |
+        // EIC_CONFIG_SENSE0_BOTH |
         EIC_CONFIG_SENSE1_BOTH |
         EIC_CONFIG_SENSE2_BOTH |
         EIC_CONFIG_SENSE3_BOTH |
@@ -141,6 +142,8 @@ void encoder_extint_init(void)
         EIC_CONFIG_SENSE6_BOTH |
         EIC_CONFIG_SENSE7_BOTH
     );
+
+
 
     EIC->INTENSET.reg = 
     (

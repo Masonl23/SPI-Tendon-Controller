@@ -74,16 +74,19 @@ public:
 
     void CalibrateLimits();
 
+    void Move_To_End(bool cw);
+
     void Set_EncA_Flag();
 
     void Set_EncB_Flag();
 
     void Set_PID_Param(float p, float i, float d);
 
-    uint8_t m_encA_ticks = 0;
-    uint8_t m_encB_ticks = 0;
+    uint32_t m_encA_ticks = 0;
+    uint32_t m_encB_ticks = 0;
 
-    int16_t m_currentTicks = 0;
+    int32_t m_currentTicks = 0;
+    float m_gear_ratio = ML_HPCB_LV_75P1;
 
 private:
     // pin settings
@@ -97,7 +100,7 @@ private:
     uint8_t m_pwm_CC = 0;
 
     // encoder values
-    int16_t m_lastTicks = 0;
+    int32_t m_lastTicks = 0;
     float m_angle = 0;
     int32_t m_target_ticks = 0;
     bool m_settled = false;
@@ -106,7 +109,7 @@ private:
     float m_kp, m_kd, m_ki, m_umax;
     float m_error_prev, m_error_integral;
     float m_prevPIDTime = 0;
-    uint16_t m_chillBand = 0;
+    uint32_t m_chillBand = 0;
 
     // current pwm speed
     uint16_t m_cur_pwm = 0;
@@ -124,8 +127,7 @@ private:
     float m_end_angle = 180;
 
     // motor and encoder default settings
-    float m_gear_ratio = ML_HPCB_LV_75P1;
-    uint8_t m_cycles_per_rev = ML_ENC_CPR;
+    uint32_t m_cycles_per_rev = ML_ENC_CPR;
 
     // name of the current tendon controller
     String m_name = "";
